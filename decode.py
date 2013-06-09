@@ -7,9 +7,10 @@ MESSAGE_LENGTH = 0.09
 ENTIRE_MESSAGE_LENGTH = 0.15
 
 class IRDeamon(object):
-    def __init__(self, rate, processor):
-        self.det = Detect(rate)
-        self.ref = Reference(rate, 15)
+    def __init__(self, rate, processor, verbose = False):
+        self._verbose = verbose
+        self.det = Detect(rate, verbose)
+        self.ref = Reference(rate, 15, verbose)
         self.processor = processor
         self.min_length = int((ENTIRE_MESSAGE_LENGTH)*rate)
         self.message_length = int(MESSAGE_LENGTH*rate)
@@ -18,7 +19,9 @@ class IRDeamon(object):
     def process_signal(self, data):
         self.data.extend(data)
         while len(self.data) > self.min_length:
-            test_result = self.ref.test_data(self.data[:-self.min_length])
+            test_result = self.ref.test_data(self.data)
+            if test_result == 1 and len(self.data) - self.ref.start < self.min_length:
+                break
             if test_result == 1:
                 button = self.det.detect_button(self.data[self.ref.start:])
                 if button is not None:
@@ -29,6 +32,8 @@ class IRDeamon(object):
             else:
                 self.data = self.data[-self.min_length*2:]
                 break
+        if self._verbose:
+            print 'number of data points carried over: %d' % len(self.data)
             
     # def plot_comparison(self, data):
         # x = linspace(0, len(data)/float(self.ref.rate), len(data))
@@ -39,7 +44,8 @@ class IRDeamon(object):
         # pylab.show()
 
 class Reference(object):
-    def __init__(self, rate, error_threshold):
+    def __init__(self, rate, error_threshold, verbose = False):
+        self._verbose = verbose
         self.t= 0.015
         self.error_threshold = error_threshold
         self.rate = rate
@@ -51,6 +57,7 @@ class Reference(object):
         self.fname = 'reference_signal.pkl'
         self.reference = None
         self.start = None
+        self._load_reference()
         
     def add_example(self, data):
         if not self._interpolate(data):
@@ -68,16 +75,15 @@ class Reference(object):
         pickle.dump(self.reference, open(self.fname, 'wb'))
         
     def test_data(self, data):
-        if self.reference is None:
-            self._load_reference()
         if not self._interpolate(data):
             return -1
         error = self._error(self.interp_func(self.x2))
         if error < self.error_threshold:
-            print 'error in signal compared to reference: %0.3f' % error
             return 1
         else:
             return 0
+        if self._verbose:
+            print 'error in signal compared to reference: %0.3f' % error
         
     def _error(self, y_vals):
         return mean(abs(y_vals - self.reference['y']))/mean(abs(self.reference['y']))*100
@@ -90,24 +96,25 @@ class Reference(object):
         self.start = ion[0]
         finish = self.start + self.test_samples
         data = data[self.start:finish]
-        try:
-            self.interp_func = interp1d(self.x1, data)
-        except ValueError, e:
-            print e
-            print 'len(self.x1): %d, len(data): %s' % (len(self.x1), len(data))
+        if len(self.x1) != len(data):
+            if self._verbose:
+                print 'len(self.x1): %d, len(data): %s' % (len(self.x1), len(data))
             return False
+        self.interp_func = interp1d(self.x1, data)
         return True
     
     def _load_reference(self):
         self.reference = pickle.load(open(self.fname, 'rb'))
 
 class Detect(object):
-    def __init__(self, rate):
+    def __init__(self, rate, verbose = False):
+        self._verbose = verbose
         self.rate = rate
         self.buttons = ['PLAYPAUSE', 'BACK', 'FORWARD', 'STOP', 'EJECT', 'PAUSE']
         self.current_settings = ['','','','','','']
         self.codes = {}
         self.fname = 'button_definitions.pkl'
+        self._load_codes()
         
     def learn_button(self, button, data):
         message = decode(data, self.rate)
@@ -123,11 +130,10 @@ class Detect(object):
         print '%d buttons saved' % len(self.codes)
         
     def detect_button(self, data):
-        if self.codes == {}:
-            self._load_codes()
         message = decode(data, self.rate)
         if message not in self.codes.keys():
-            print 'button unknown: %s' % bin(message)
+            if self._verbose:
+                print 'unknown button: %s' % bin(message)
             return None
         else:
             return self.codes[message]

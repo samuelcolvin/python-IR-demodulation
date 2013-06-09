@@ -1,4 +1,4 @@
-import pylab, pdb
+import pylab, sys
 import matplotlib.cm as cm
 from numpy import *
 import decode, record, press_key
@@ -49,41 +49,32 @@ def learn_buttons():
 def print_button(button):
     print '    pressed: %s' % button
     
-def test_buttons():
-    RECORD_SECONDS = 4
-    ir = decode.IRDeamon(record.RATE, print_button)
-    for i in range(5):
-        print 'Testing, press button now...'
-        data = record.record_for_time(RECORD_SECONDS)
-        ir.process_signal(data)
+def test_demod():
+    ir = decode.IRDeamon(record.RATE, print_button, True)
+    record.continuous(ir.process_signal, 20)
     
 def do_press(button):
     if not hasattr(press_key.Buttons, button):
         print 'no such function in buttons class: %s' % button
     else:
-        print 'pressing %s' % button
+        print button
         getattr(press_key.Buttons, button)()
     
-def run_deamon():
-    RECORD_SECONDS = 4
+def run():
     ir = decode.IRDeamon(record.RATE, do_press)
     record.continuous(ir.process_signal)
- 
-# setup_reference()
-# learn_buttons()
-run_deamon()
 
-
-# def add_to_data(data_in):
-    # global data
-    # print 'adding to data'
-    # data.extend(data_in)
-
-# data=[]
-# record.continuous(add_to_data)
-# pylab.figure(1)
-# t = linspace(0, 2, len(data))
-# pylab.plot(t, data, linewidth=0.5)
-# pylab.xlabel('Time (s)')
-# pylab.ylabel('Amplitude')
-# pylab.show()
+if __name__ == '__main__':
+    usage = 'python-IR-demodulation, Samuel Colvin June 2013 Usage:\n run.py setup_refs || learn_buttons || test_demod || run_active'
+    if len(sys.argv) != 2:
+        print usage
+    elif sys.argv[1] == 'setup_refs':
+        setup_reference()
+    elif sys.argv[1] == 'learn_buttons':
+        learn_buttons()
+    elif sys.argv[1] == 'test_demod':
+        test_demod()
+    elif sys.argv[1] == 'run_active':
+        run()
+    else:
+        print usage

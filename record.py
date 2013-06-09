@@ -4,8 +4,7 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 
-def continuous(call):
-    seconds = 24*3600
+def continuous(call, seconds = 24*3600):
     audiostream = AudioSteam()
     
     for i in range(0, int(RATE / CHUNK * seconds)):
