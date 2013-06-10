@@ -35,7 +35,7 @@ class IRDeamon(object):
     def decode_message(self):
         if self._verbose:
             print 'index of detected message: %d' % self.ref.start
-        action = self.det.detect_button(self.data[self.ref.start:])
+        action = self.det.get_msg_detect(self.data[self.ref.start:])
         if action is not None:
             self.processor(action)
 
@@ -81,7 +81,13 @@ class Reference(object):
             return 0
         
     def _error(self, y_vals):
-        return mean(abs(y_vals - self.reference['y']))/mean(abs(self.reference['y']))*100
+        ref_mean = mean(abs(self.reference['y']))
+        if ref_mean == 0:
+            if self._verbose:
+                print 'reference mean == 0, unable to compute % error'
+            return 100
+        err_mean = mean(abs(y_vals - self.reference['y']))
+        return err_mean/ref_mean*100
         
     def _interpolate(self, data):
         onoff = less(data, settings.THRESHOLD)*1
@@ -126,8 +132,11 @@ class Detect(object):
         dump_json_pretty(self.codes, self.fname)
         print '%d buttons saved' % len(self.codes)
         
-    def detect_button(self, data):
+    def get_msg_detect(self, data):
         message = Decode(data, self._verbose).message
+        return self.detect_action(message)
+        
+    def detect_action(self, message):
         if message not in self.codes.keys():
             if self._verbose:
                 print 'unknown action: %s' % bin(message)

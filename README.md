@@ -9,9 +9,11 @@ The program can be used to trigger actions such as play or pause music, click a 
 
 Works with an infrared reciever like [this](http://www.networkedmediatank.com/showthread.php?tid=29013) plugged into the mic port.
 
+I've tested and used it with a Cambridge Audio remote Model: RC-340AC. Small changes to settings.py should allow it to be used with another remote.
+
 Requirements: pyaudio, matplotlib, scipy, numpy, pickle and some other pretty standard python modules.
 
-Currently running on Windows 7 and not tested on any other platform (but you might be lucky).
+Currently running on Windows 7 and not tested on any other platforms.
 
 
 Usage:

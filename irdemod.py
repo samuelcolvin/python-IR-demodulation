@@ -54,6 +54,7 @@ def learn_actions():
 def plot_signal():
     seconds = 4
     ref = decode.Reference(True)
+    det = decode.Detect()
     print 'Recording, press button now...'
     data = monitor.record_for_time(seconds)
     print 'stop'
@@ -84,10 +85,14 @@ def plot_signal():
         print 'length of header cut off: %d samples - %0.4f secs' % (dec.start, secs)
         secs = (dec.finish - dec.start)/float(settings.RATE)
         print 'length of message: %d samples - %0.4f secs' % (dec.finish - dec.start, secs)
+        code = det.detect_action(dec.message)
+        if code is not None:
+            print 'message decodes as %s' % code['name']
         pylab.figure(3)
         pylab.subplot(211)
         data = data[dec.start:dec.finish]
         pylab.plot(range(len(data)), data, 'r')
+        pylab.title('Signal Processing')
         pylab.xlabel('Samples')
         pylab.ylabel('Amplitude')
         pylab.subplot(212)
@@ -102,7 +107,7 @@ def plot_signal():
         pylab.plot(range(len(data)), y, 'k', linewidth=2)
         pylab.legend(['on off', 'bits'])
         pylab.xlabel('Samples')
-        pylab.ylabel('Amplitude')
+        pylab.ylabel('0/1')
         pylab.ylim([-0.05, 1.05])
         pylab.grid(True)
     pylab.show()
