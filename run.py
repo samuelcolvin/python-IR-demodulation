@@ -1,9 +1,7 @@
 import pylab, sys
 import matplotlib.cm as cm
 from numpy import *
-import decode, record, press_key
-from scipy.interpolate import interp1d
-import pickle
+import decode, monitor, press_key
 
 def setup_reference():
     RECORD_SECONDS = 2
@@ -63,11 +61,20 @@ def do_press(button):
 def run():
     ir = decode.IRDeamon(record.RATE, do_press)
     record.continuous(ir.process_signal)
+    
+def print_usage():
+    try:
+        readme = open('README.md', 'r').read()
+        usage = readme[readme.index('<!--usage-->')+12:readme.index('<!--/usage-->')]
+        usage = usage.strip()
+        usage = usage.replace('\t', '')
+    except:
+        usage = 'python-IR-demodulation see README.md for details.' 
+    print usage
 
 if __name__ == '__main__':
-    usage = 'python-IR-demodulation, Samuel Colvin June 2013 Usage:\n run.py setup_refs || learn_buttons || test_demod || run_active'
     if len(sys.argv) != 2:
-        print usage
+        print_usage()
     elif sys.argv[1] == 'setup_refs':
         setup_reference()
     elif sys.argv[1] == 'learn_buttons':
@@ -77,4 +84,4 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'run_active':
         run()
     else:
-        print usage
+        print_usage()
