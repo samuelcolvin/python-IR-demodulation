@@ -84,7 +84,7 @@ class Reference(object):
         ref_mean = mean(abs(self.reference['y']))
         if ref_mean == 0:
             if self._verbose:
-                print 'reference mean == 0, unable to compute % error'
+                print 'reference mean = 0, unable to compute % error'
             return 100
         err_mean = mean(abs(y_vals - self.reference['y']))
         return err_mean/ref_mean*100
