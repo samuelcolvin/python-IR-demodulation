@@ -219,26 +219,6 @@ class Decode(object):
             return
         msg_str = ''.join([str(b) for b in self.bits])
         self.message = int(msg_str, 2)
-        
-#     def _convert_bits(self, bits_old):    
-#         bits1 = bits_old[settings.BIT_HEADER:]
-#         self.bit_ranges = self.bit_ranges[settings.BIT_HEADER:]
-#         if len(bits1) < 5:
-#             self.bits = []
-#             self.bit_ranges = []
-#             return
-#         if len(bits1) % 2 != 0:
-#             bits1.append(0)
-#             self.bit_ranges.append([0, 0])
-#         bits2=[]
-#         bit_range2 = []
-#         for i in range(0, len(bits1),2):
-#             bits2.append(bits1[i] * bits1[i+1])
-#             bit_range2.append([self.bit_ranges[i][0], self.bit_ranges[i+1][1]])
-#         self.bits = bits2
-#         self.bit_ranges = bit_range2
-#         msg_str = ''.join([str(b) for b in self.bits])
-#         self.message = int(msg_str, 2)
 
 def dump_json_pretty(data, fname):
     json.dump(data, open(fname,'w'),
