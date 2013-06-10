@@ -1,3 +1,4 @@
+# taken from: http://stackoverflow.com/questions/11906925/python-simulate-keydown
 WHEEL_DELTA = 120
 XBUTTON1 = 0x0001
 XBUTTON2 = 0x0002

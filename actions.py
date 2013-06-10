@@ -1,3 +1,4 @@
+# taken from: http://stackoverflow.com/questions/11906925/python-simulate-keydown
 import ctypes, codes
 
 LONG = ctypes.c_long
