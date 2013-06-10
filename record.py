@@ -4,14 +4,13 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 
-def continuous(call, seconds = 24*3600):
+def continuous(call, seconds = 24*3600*30):
     audiostream = AudioSteam()
     
-    for i in range(0, int(RATE / CHUNK * seconds)):
+    for _ in range(0, int(RATE / CHUNK * seconds)):
         data = audiostream.stream.read(CHUNK)
         count = len(data)/2
-        format = "%dh" % count
-        shorts = struct.unpack(format, data)
+        shorts = struct.unpack('%dh' % count, data)
         call(shorts)
 
     audiostream.close()
@@ -19,7 +18,7 @@ def continuous(call, seconds = 24*3600):
 def record_for_time(seconds):
     audiostream = AudioSteam()
     frames = []
-    for i in range(0, int(RATE / CHUNK * seconds)):
+    for _ in range(0, int(RATE / CHUNK * seconds)):
         data = audiostream.stream.read(CHUNK)
         frames.append(data)
 
@@ -27,8 +26,7 @@ def record_for_time(seconds):
     samples = []
     for block in frames:
         count = len(block)/2
-        format = "%dh"%(count)
-        shorts = struct.unpack( format, block )
+        shorts = struct.unpack( '%dh' % count, block )
         samples.extend(shorts)
     return samples
     
