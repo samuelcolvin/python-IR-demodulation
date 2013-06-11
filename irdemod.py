@@ -1,7 +1,5 @@
-import pylab, sys, pdb
-import matplotlib.cm
-import numpy
-import decode, monitor, actions, settings
+import sys
+import decode, monitor, settings, actions
 
 def setup_reference():
     seconds = 2
@@ -141,12 +139,16 @@ def print_usage():
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print_usage()
-    elif sys.argv[1] == 'setup_refs':
-        setup_reference()
+    elif sys.argv[1] in ['setup_refs', 'plot_signal']:
+        import pylab
+        import matplotlib.cm
+        import numpy
+        if sys.argv[1] == 'setup_refs':
+            setup_reference()
+        elif sys.argv[1] == 'plot_signal':
+            plot_signal()
     elif sys.argv[1] == 'learn_actions':
         learn_actions()
-    elif sys.argv[1] == 'plot_signal':
-        plot_signal()
     elif sys.argv[1] == 'verbose_test':
         verbose_test()
     elif sys.argv[1] == 'run_active':

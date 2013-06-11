@@ -1,15 +1,21 @@
 import pyaudio, struct, settings
 
-def continuous(call, seconds = 24*3600*30):
+def continuous(call, seconds = None):
     audiostream = AudioSteam()
     
-    for _ in range(0, int(settings.RATE / settings.CHUNK * seconds)):
+    if seconds:
+        finish_at = int(settings.RATE / settings.CHUNK * seconds)
+        i = 0
+    while True:
         data = audiostream.stream.read(settings.CHUNK)
         count = len(data)/2
         shorts = struct.unpack('%dh' % count, data)
         call(shorts)
-
-    audiostream.close()
+        if seconds:
+            i+=1
+            if i>=finish_at:
+                audiostream.close()
+                return
 
 def record_for_time(seconds):
     audiostream = AudioSteam()
