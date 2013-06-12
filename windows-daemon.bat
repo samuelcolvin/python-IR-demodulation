@@ -1,0 +1,1 @@
+start pythonw.exe irdemod.py run_active

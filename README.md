@@ -37,3 +37,6 @@ Usage:
 	
 <!--/usage-->
 
+To run as a daemon on windows call:
+    C:\path\to\python-IR-demodulation\windows-daemon.bat
+(You can create a shortcut to call this; you need to set "start in" to the directory of python-IR-demodulation as well)
